@@ -81,6 +81,56 @@ section h3 {
   font-size: 1.4rem;
 }
 
+.section-intro {
+  margin-bottom: 20px;
+  color: #4b5563;
+}
+
+.track-section {
+  margin-bottom: 24px;
+}
+
+.track-section:last-child {
+  margin-bottom: 0;
+}
+
+.track-section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 16px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #edf5ff, #f8fbff);
+  border: 1px solid #cfe0f8;
+}
+
+.track-section-header h4 {
+  color: #003d7a;
+  font-size: 1.2rem;
+  margin-bottom: 4px;
+}
+
+.track-section-header p {
+  color: #516173;
+}
+
+.track-count {
+  white-space: nowrap;
+  background: #003d7a;
+  color: white;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.track-capability-grid {
+  display: grid;
+  gap: 16px;
+}
+
 .capability-card {
   margin-bottom: 20px;
   padding: 20px;
@@ -102,6 +152,25 @@ section h3 {
   font-size: 1.3rem;
   border-bottom: 1px solid #e3f2fd;
   padding-bottom: 8px;
+}
+
+.capability-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.track-badge {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  border-radius: 999px;
+  background: #e3f2fd;
+  color: #003d7a;
+  font-size: 0.85rem;
+  font-weight: bold;
+  padding: 6px 10px;
 }
 
 .capability-card p {
@@ -290,6 +359,12 @@ footer {
   .header-content {
     flex-direction: column;
     gap: 10px;
+  }
+
+  .track-section-header,
+  .capability-card-header {
+    flex-direction: column;
+    align-items: flex-start;
   }
   
   .mascot {

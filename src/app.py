@@ -19,10 +19,27 @@ current_dir = Path(__file__).parent
 app.mount("/static", StaticFiles(directory=os.path.join(Path(__file__).parent,
           "static")), name="static")
 
+# Role-based competency tracks.
+tracks = {
+    "Engineering": {
+        "description": "Platform, cloud, security, and data engineering capabilities for delivery teams."
+    },
+    "Strategy": {
+        "description": "Business and digital strategy capabilities that shape transformation roadmaps."
+    },
+    "Experience Design": {
+        "description": "Product, design, and experience capabilities focused on customer outcomes."
+    },
+    "Delivery": {
+        "description": "Change, agile, and operating model capabilities that improve execution."
+    }
+}
+
 # In-memory capabilities database
 capabilities = {
     "Cloud Architecture": {
         "description": "Design and implement scalable cloud solutions using AWS, Azure, and GCP",
+        "track": "Engineering",
         "practice_area": "Technology",
         "skill_levels": ["Emerging", "Proficient", "Advanced", "Expert"],
         "certifications": ["AWS Solutions Architect", "Azure Architect Expert"],
@@ -32,6 +49,7 @@ capabilities = {
     },
     "Data Analytics": {
         "description": "Advanced data analysis, visualization, and machine learning solutions",
+        "track": "Engineering",
         "practice_area": "Technology", 
         "skill_levels": ["Emerging", "Proficient", "Advanced", "Expert"],
         "certifications": ["Tableau Desktop Specialist", "Power BI Expert", "Google Analytics"],
@@ -41,6 +59,7 @@ capabilities = {
     },
     "DevOps Engineering": {
         "description": "CI/CD pipeline design, infrastructure automation, and containerization",
+        "track": "Engineering",
         "practice_area": "Technology",
         "skill_levels": ["Emerging", "Proficient", "Advanced", "Expert"], 
         "certifications": ["Docker Certified Associate", "Kubernetes Admin", "Jenkins Certified"],
@@ -50,6 +69,7 @@ capabilities = {
     },
     "Digital Strategy": {
         "description": "Digital transformation planning and strategic technology roadmaps",
+        "track": "Strategy",
         "practice_area": "Strategy",
         "skill_levels": ["Emerging", "Proficient", "Advanced", "Expert"],
         "certifications": ["Digital Transformation Certificate", "Agile Certified Practitioner"],
@@ -59,6 +79,7 @@ capabilities = {
     },
     "Change Management": {
         "description": "Organizational change leadership and adoption strategies",
+        "track": "Delivery",
         "practice_area": "Operations",
         "skill_levels": ["Emerging", "Proficient", "Advanced", "Expert"],
         "certifications": ["Prosci Certified", "Lean Six Sigma Black Belt"],
@@ -68,6 +89,7 @@ capabilities = {
     },
     "UX/UI Design": {
         "description": "User experience design and digital product innovation",
+        "track": "Experience Design",
         "practice_area": "Technology",
         "skill_levels": ["Emerging", "Proficient", "Advanced", "Expert"],
         "certifications": ["Adobe Certified Expert", "Google UX Design Certificate"],
@@ -77,6 +99,7 @@ capabilities = {
     },
     "Cybersecurity": {
         "description": "Information security strategy, risk assessment, and compliance",
+        "track": "Engineering",
         "practice_area": "Technology",
         "skill_levels": ["Emerging", "Proficient", "Advanced", "Expert"],
         "certifications": ["CISSP", "CISM", "CompTIA Security+"],
@@ -86,6 +109,7 @@ capabilities = {
     },
     "Business Intelligence": {
         "description": "Enterprise reporting, data warehousing, and business analytics",
+        "track": "Engineering",
         "practice_area": "Technology",
         "skill_levels": ["Emerging", "Proficient", "Advanced", "Expert"],
         "certifications": ["Microsoft BI Certification", "Qlik Sense Certified"],
@@ -95,6 +119,7 @@ capabilities = {
     },
     "Agile Coaching": {
         "description": "Agile transformation and team coaching for scaled delivery",
+        "track": "Delivery",
         "practice_area": "Operations",
         "skill_levels": ["Emerging", "Proficient", "Advanced", "Expert"],
         "certifications": ["Certified Scrum Master", "SAFe Agilist", "ICAgile Certified"],
@@ -113,6 +138,23 @@ def root():
 @app.get("/capabilities")
 def get_capabilities():
     return capabilities
+
+
+@app.get("/tracks")
+def get_tracks():
+    grouped_tracks = {
+        track_name: {
+            **track_details,
+            "capabilities": {}
+        }
+        for track_name, track_details in tracks.items()
+    }
+
+    for capability_name, capability_details in capabilities.items():
+        track_name = capability_details["track"]
+        grouped_tracks[track_name]["capabilities"][capability_name] = capability_details
+
+    return grouped_tracks
 
 
 @app.post("/capabilities/{capability_name}/register")
