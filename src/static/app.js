@@ -4,58 +4,97 @@ document.addEventListener("DOMContentLoaded", () => {
   const registerForm = document.getElementById("register-form");
   const messageDiv = document.getElementById("message");
 
+  function createCapabilityCard(name, details) {
+    const capabilityCard = document.createElement("div");
+    capabilityCard.className = "capability-card";
+
+    const availableCapacity = details.capacity || 0;
+    const currentConsultants = details.consultants ? details.consultants.length : 0;
+
+    const consultantsHTML =
+      details.consultants && details.consultants.length > 0
+        ? `<div class="consultants-section">
+            <h5>Registered Consultants:</h5>
+            <ul class="consultants-list">
+              ${details.consultants
+                .map(
+                  (email) =>
+                    `<li><span class="consultant-email">${email}</span><button class="delete-btn" data-capability="${name}" data-email="${email}">❌</button></li>`
+                )
+                .join("")}
+            </ul>
+          </div>`
+        : `<p><em>No consultants registered yet</em></p>`;
+
+    capabilityCard.innerHTML = `
+      <div class="capability-card-header">
+        <h4>${name}</h4>
+        <span class="track-badge">${details.track}</span>
+      </div>
+      <p>${details.description}</p>
+      <p><strong>Track:</strong> ${details.track}</p>
+      <p><strong>Practice Area:</strong> ${details.practice_area}</p>
+      <p><strong>Industry Verticals:</strong> ${details.industry_verticals ? details.industry_verticals.join(", ") : "Not specified"}</p>
+      <p><strong>Capacity:</strong> ${availableCapacity} hours/week available</p>
+      <p><strong>Current Team:</strong> ${currentConsultants} consultants</p>
+      <div class="consultants-container">
+        ${consultantsHTML}
+      </div>
+    `;
+
+    return capabilityCard;
+  }
+
   // Function to fetch capabilities from API
   async function fetchCapabilities() {
     try {
-      const response = await fetch("/capabilities");
-      const capabilities = await response.json();
+      const response = await fetch("/tracks");
+      const tracks = await response.json();
 
       // Clear loading message
       capabilitiesList.innerHTML = "";
+      capabilitySelect.innerHTML =
+        '<option value="">-- Select a capability --</option>';
 
-      // Populate capabilities list
-      Object.entries(capabilities).forEach(([name, details]) => {
-        const capabilityCard = document.createElement("div");
-        capabilityCard.className = "capability-card";
+      Object.entries(tracks).forEach(([trackName, trackDetails]) => {
+        const trackSection = document.createElement("div");
+        trackSection.className = "track-section";
 
-        const availableCapacity = details.capacity || 0;
-        const currentConsultants = details.consultants ? details.consultants.length : 0;
-
-        // Create consultants HTML with delete icons
-        const consultantsHTML =
-          details.consultants && details.consultants.length > 0
-            ? `<div class="consultants-section">
-              <h5>Registered Consultants:</h5>
-              <ul class="consultants-list">
-                ${details.consultants
-                  .map(
-                    (email) =>
-                      `<li><span class="consultant-email">${email}</span><button class="delete-btn" data-capability="${name}" data-email="${email}">❌</button></li>`
-                  )
-                  .join("")}
-              </ul>
-            </div>`
-            : `<p><em>No consultants registered yet</em></p>`;
-
-        capabilityCard.innerHTML = `
-          <h4>${name}</h4>
-          <p>${details.description}</p>
-          <p><strong>Practice Area:</strong> ${details.practice_area}</p>
-          <p><strong>Industry Verticals:</strong> ${details.industry_verticals ? details.industry_verticals.join(', ') : 'Not specified'}</p>
-          <p><strong>Capacity:</strong> ${availableCapacity} hours/week available</p>
-          <p><strong>Current Team:</strong> ${currentConsultants} consultants</p>
-          <div class="consultants-container">
-            ${consultantsHTML}
+        const capabilityEntries = Object.entries(trackDetails.capabilities || {});
+        trackSection.innerHTML = `
+          <div class="track-section-header">
+            <div>
+              <h4>${trackName}</h4>
+              <p>${trackDetails.description}</p>
+            </div>
+            <span class="track-count">${capabilityEntries.length} capabilities</span>
           </div>
+          <div class="track-capability-grid"></div>
         `;
 
-        capabilitiesList.appendChild(capabilityCard);
+        const capabilityGrid = trackSection.querySelector(".track-capability-grid");
 
-        // Add option to select dropdown
-        const option = document.createElement("option");
-        option.value = name;
-        option.textContent = name;
-        capabilitySelect.appendChild(option);
+        capabilityEntries.forEach(([name, details]) => {
+          capabilityGrid.appendChild(createCapabilityCard(name, details));
+
+          const option = document.createElement("option");
+          option.value = name;
+          option.textContent = `${name} (${trackName})`;
+          const optgroupLabel = capabilitySelect.querySelector(
+            `optgroup[label="${trackName}"]`
+          );
+
+          if (optgroupLabel) {
+            optgroupLabel.appendChild(option);
+          } else {
+            const optgroup = document.createElement("optgroup");
+            optgroup.label = trackName;
+            optgroup.appendChild(option);
+            capabilitySelect.appendChild(optgroup);
+          }
+        });
+
+        capabilitiesList.appendChild(trackSection);
       });
 
       // Add event listeners to delete buttons
